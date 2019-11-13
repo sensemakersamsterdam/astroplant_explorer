@@ -63,11 +63,13 @@ def lcd_string(message,line):
 def main():
 
   lcd_init()
-  
+  lcd_string("if network known", LCD_LINE_1)
+  lcd_string("IP address in60s", LCD_LINE_2)
   while True:
     myIP = str((([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0])
     lcd_string(myIP,LCD_LINE_1)
-    time.sleep(3)
+    lcd_string("TIJD:" + str(now.hour) + ":" + str(now.minute), LCD_LINE_2) 
+    time.sleep(30)
 
 if __name__ == '__main__':
 
