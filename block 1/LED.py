@@ -1,10 +1,11 @@
-import RPi.GPIO as GPIO
-import time
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
-GPIO.setup(20, GPIO.OUT)
-print("LED on")
-GPIO.output(20, GPIO.HIGH)
-time.sleep(1)
-print("LED off")
-GPIO.output(20, GPIO.LOW)
+"""Simple script to switch LED1 on for one second.
+"""
+import RPi.GPIO as GPIO             # Import GPIO library
+import astroplant_explorer as AE    # Set up GPIO for astroplat and get AE symbols
+from time import sleep              # Get the sleep function
+
+print("LED1 on")
+GPIO.output(AE.LED1, GPIO.HIGH)     # LED1 is on now
+sleep(1)                            # Wait a second
+print("LED1 off")
+GPIO.output(AE.LED1, GPIO.LOW)      # LED1 is off again

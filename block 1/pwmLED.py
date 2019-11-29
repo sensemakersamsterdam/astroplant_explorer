@@ -1,32 +1,39 @@
-import RPi.GPIO as GPIO
-import time
-GPIO.setmode(GPIO.BCM)
+"""Script to show how to program LED1 intensity with Pulse Width Modulation (PWM)
+"""
+import RPi.GPIO as GPIO             # Import GPIO library
+import astroplant_explorer as AE    # Set up GPIO for astroplat and get AE symbols
+from time import sleep              # Get the sleep function
 
 
-GPIO.setup(20, GPIO.OUT)
-pwm = GPIO.PWM(20, 100)   # Initialize PWM on pwmPin 100Hz frequency
+# Initialize PWM on LED1 pwmPin 100Hz frequency
+pwm = GPIO.PWM(AE.LED1, 100)
+pwm.start(0)   # Start PWM with 0% duty cycle
 
+# begin main loop of program
+print("\nPress Ctl-C to quit...")
+try:
+    # Infinite loop until Ctl C is pressed to stop program.
+    while True:
+        # Loop with dc set from 0 to 100 stepping dc up by 5 each loop
+        for dc in range(0, 101, 5):
+            pwm.ChangeDutyCycle(dc)
+            # Wait for 0.05 s = 50 ms at current LED brightness level
+            sleep(0.05)
+            print(dc, end=',')
+        print()
 
-# main loop of program
-print("\nPress Ctl C to quit \n")
-dc=0
-# set dc variable to 0 (will start PWM at 0% duty cycle)
-pwm.start(dc)
-# Start PWM with 0% duty cycle
-while True:
-# Create an infinite loop until Ctl C is pressed to stop program.
-  for dc in range(0, 101, 5):
-# Loop with dc set from 0 to 100 stepping dc up by 5 each loop
-    pwm.ChangeDutyCycle(dc)
-    time.sleep(0.05)
-# wait for .05 seconds at current LED brightness level
-    print(dc)
-  for dc in range(95, 0, -5):
-# Loop with dc set from 95 to 5 stepping dc down by 5 each loop
-    pwm.ChangeDutyCycle(dc)
-    time.sleep(0.05)
-# wait for .05 seconds at current LED brightness level
-    print(dc)
+        # Loop with dc set from 95 to 5 stepping dc down by 5 each loop
+        for dc in range(95, 0, -5):
+            pwm.ChangeDutyCycle(dc)
+            # wait for 0.05 s = 50 ms at current LED brightness level
+            sleep(0.05)
+            print(dc, end=',')
+        print()
 
-pwm.stop()
-GPIO.cleanup()
+except KeyboardInterrupt:
+    print("Ctl-c has been pressed.")
+finally:
+    # Shut down LED1
+    pwm.stop()
+    GPIO.output(AE.LED1, GPIO.LOW)
+    GPIO.cleanup()
