@@ -1,12 +1,12 @@
-#relay script. Zet een standaard relais aan en uit, op dezelfde manier als een LED.
-import RPi.GPIO as GPIIO
-import time
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
-GPIO.setup(16, GPIO.OUT)
+"""Script to switch a relay on and off. Similar to the LED switch from block 1.
+"""
+import RPi.GPIO as GPIO             # Import GPIO library
+import astroplant_explorer as AE    # Set up GPIO for astroplat and get AE symbols
+from time import sleep              # Get the sleep function
 
-GPIO.output(16, GPIO.HIGH)
-print("relay on")
-time.sleep(3)
-GPIO.output(16, GPIO.LOW)
-print("relay off")
+GPIO.output(AE.RY1, GPIO.HIGH)
+print("relay 1 on")
+sleep(3)
+GPIO.output(AE.RY1, GPIO.LOW)
+print("relay  1 off")
+GPIO.cleanup()
