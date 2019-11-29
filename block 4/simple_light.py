@@ -2,6 +2,7 @@
 # for explanation of time functions see https://docs.python.org/3/library/time.…
 # this script uses time in minutes: every day has 24 x 60 = 1440 minutes 
 # every minute conditions are evaluated and lighting changed when needed
+# new comment in own branche featureTed
 
 import time
 
