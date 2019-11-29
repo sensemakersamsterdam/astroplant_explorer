@@ -5,7 +5,14 @@ import waterTemp_1x
 import co2_1x
 import light_1x
 import pathlib # to test if logfile already exists
-import lcdi2c   
+import lcdi2c
+import subprocess # to get IP address from shell
+
+try:
+  IP = subprocess.check_output(["hostname","-I"]).decode('ascii')
+  lcdi2c.display('IP address',str(IP),10)
+except:
+  lcdi2c.display('No IP address','',10)
 
 lcdi2c.display('Starting','measurements',5)
 
