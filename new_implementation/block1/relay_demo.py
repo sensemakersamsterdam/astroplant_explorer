@@ -1,9 +1,12 @@
-from ae_explorer import AE_Pin, OFF
-from ae_explorer.ae_relay import AE_Relay
 from time import sleep
-import sys
+if True:
+    import sys
+    sys.path.append('..')
+    from ae_drivers import AE_Pin, OFF
+    from ae_drivers.relay import AE_Relay
 
-rly1 = AE_Relay('RLY1', 'Fan1 Relay', AE_Pin.D16)
+
+rly1 = AE_Relay('rly1', 'Fan1 Relay', AE_Pin.D16)
 rly1.setup(initial_state=OFF)
 
 print('Relay demo. rly1 prints as:', rly1)

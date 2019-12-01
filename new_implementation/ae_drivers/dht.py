@@ -1,3 +1,4 @@
+# ToDo: copyright etc.
 from . import _AE_Peripheral_Base
 import Adafruit_DHT as DHT  # Library copyright Adafruit
 from Adafruit_DHT import DHT22, DHT11, AM2302

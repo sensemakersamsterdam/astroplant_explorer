@@ -1,3 +1,4 @@
+# ToDo: copyright etc.
 import RPi.GPIO as GPIO
 from enum import Enum
 

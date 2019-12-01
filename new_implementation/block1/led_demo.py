@@ -1,9 +1,11 @@
-from ae_explorer import AE_Pin, OFF
-from ae_explorer.ae_led import AE_LED
 from time import sleep
-import sys
+if True:
+    import sys
+    sys.path.append('..')
+    from ae_drivers.led import AE_LED
+    from ae_drivers import AE_Pin, OFF
 
-led1 = AE_LED('LED1', 'Super bright red LED', AE_Pin.D20)
+led1 = AE_LED('led1', 'Super bright red LED', AE_Pin.D20)
 led1.setup(initial_state=OFF)
 
 print('LED demo. led1 prints as:', led1)
