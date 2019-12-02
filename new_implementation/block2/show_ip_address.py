@@ -13,7 +13,7 @@ See https: // github.com/sensemakersamsterdam/astroplant_explorer
 from ae_drivers.lcd import AE_LCD
 from ae_util.ip import IP_Utils
 
-lcd = AE_LCD()
+lcd = AE_LCD('lcd', '16x2 LCD display')
 lcd.setup(erase=False)
 
 ip_address = IP_Utils.get_main_ip_address() or 'no IP Address'

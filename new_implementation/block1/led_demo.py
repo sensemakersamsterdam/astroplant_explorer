@@ -10,6 +10,8 @@ See https://github.com/sensemakersamsterdam/astroplant_explorer
 # To test start python, import sys and type sys.path. The ae module directory
 # should be included.
 
+from time import sleep
+import sys
 from ae_drivers.led import AE_LED
 from ae_drivers import AE_Pin, OFF
 
@@ -29,7 +31,7 @@ print('LED going on and off rapidly 20 times...')
 for _ in range(20):
     led1.toggle()
     sleep(0.2)
-    print('.', end='', sep='')
+    print('.', end='')
     sys.stdout.flush()
 print('\nDone!\n')
 

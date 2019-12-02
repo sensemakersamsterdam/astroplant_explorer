@@ -51,6 +51,7 @@ class AE_LCD(_AE_Peripheral_Base):
         super().__init__(name, description, 'LCD')
         self._addr = i2c_address
         self._bus_number = i2c_bus
+        self._n_err = 0
         self.backlight()
 
     def backlight(self, on=True):
@@ -81,7 +82,11 @@ class AE_LCD(_AE_Peripheral_Base):
             strobe(mode | ((bits << 4) & 0xF0) |
                    LCD_BACKLIGHT)  # Low bits second
         except Exception as ex:
-            print(ex)
+            self._n_err += 1
+            if self._n_err == 4:
+                print(self.name, ex, '- further errors will be suppressed.')
+            elif self._n_err < 4:
+                print(self.name, ex)
 
     def lcd_string(self, message, line):
         assert line == 0 or line == 1, 'Line is 0 or 1.'

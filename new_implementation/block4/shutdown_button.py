@@ -24,7 +24,7 @@ import os
 btn3 = AE_Button('btn3', 'Stop button', AE_Pin.D7)
 btn3.setup()
 
-HALT = 'sudo shutdown -h --no-wall now'
+HALT = '/usr/bin/sudo /sbin/shutdown -h --no-wall now'
 
 while True:
     while not btn3.value():
@@ -43,8 +43,8 @@ while True:
                 os.system(HALT)
                 sleep(30)  # Wait for the shutdown
             finally:
-                print('Error: make sure shutdown is in the path and user',
-                      'is setuid root or can sudo without password!')
+                print('Error: make sure user is root, this program is setuid root\n',
+                      'or sudo for user works without password!')
                 sys.exit(-1)
         sleep(1)
 

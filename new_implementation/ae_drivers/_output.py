@@ -7,7 +7,7 @@ See https: // github.com/sensemakersamsterdam/astroplant_explorer
 # Author: Gijs Mos
 #
 
-from . import _AE_Peripheral, GPIO
+from . import _AE_Peripheral, GPIO, ON, OFF
 
 
 class _AE_Output(_AE_Peripheral):
@@ -43,10 +43,10 @@ class _AE_Output(_AE_Peripheral):
             GPIO.output(self._pin.value[0], initial_state)
 
     def on(self):
-        return self.value(True)
+        return self.value(ON)
 
     def off(self):
-        return self.value(False)
+        return self.value(OFF)
 
     def toggle(self):
         return self.value(not self.value())

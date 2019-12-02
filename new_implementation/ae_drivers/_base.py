@@ -81,7 +81,7 @@ class _AE_Peripheral(_AE_Peripheral_Base):
         raise NotImplementedError
 
     def is_on(self):
-        return self.value() != OFF
+        return self.value() == ON
 
     def is_off(self):
         return self.value() == OFF
