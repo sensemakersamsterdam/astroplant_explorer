@@ -1,7 +1,7 @@
 {
     "ae_id": "gijs0001",
     "local_MQTT": {
-        "root_topic": "/asex/{ae_id}/"
+        "root_topic": "asex/{ae_id}/"
     },
     "buttons": [{
             "name": "btn1",

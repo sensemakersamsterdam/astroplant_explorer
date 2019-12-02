@@ -1,3 +1,15 @@
+"""
+Demo/test program for the AE_Toggle_Button and AE_LED drivers.
+See https://github.com/sensemakersamsterdam/astroplant_explorer
+"""
+#
+# (c) Sensemakersams.org and others. See https://github.com/sensemakersamsterdam/astroplant_explorer
+# Author: Gijs Mos
+#
+# Warning: if import of ae_* modules fails, then you need to set up PYTHONPATH.
+# To test start python, import sys and type sys.path. The ae module directory
+# should be included.
+
 from time import sleep
 if True:
     import sys

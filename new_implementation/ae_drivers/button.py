@@ -1,4 +1,12 @@
-# ToDo: copyright etc.
+"""
+ae_drivers Button code.
+See https: // github.com/sensemakersamsterdam/astroplant_explorer
+"""
+#
+# (c) Sensemakersams.org and others. See https://github.com/sensemakersamsterdam/astroplant_explorer
+# Author: Gijs Mos
+#
+
 from . import _AE_Peripheral, GPIO
 from time import time
 

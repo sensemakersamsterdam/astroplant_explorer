@@ -1,4 +1,12 @@
-# ToDo: copyright etc.
+"""
+ae_drivers AE_LED code.
+See https: // github.com/sensemakersamsterdam/astroplant_explorer
+"""
+#
+# (c) Sensemakersams.org and others. See https://github.com/sensemakersamsterdam/astroplant_explorer
+# Author: Gijs Mos
+#
+
 from ._output import _AE_Output
 
 

@@ -1,9 +1,17 @@
-from time import sleep
-if True:
-    import sys
-    sys.path.append('..')
-    from ae_drivers import AE_Pin
-    from ae_drivers.dht import AE_DHT, DHT22
+"""
+Demo/test program for the AE_DHT driver.
+See https://github.com/sensemakersamsterdam/astroplant_explorer
+"""
+#
+# (c) Sensemakersams.org and others. See https://github.com/sensemakersamsterdam/astroplant_explorer
+# Author: Gijs Mos
+#
+# Warning: if import of ae_* modules fails, then you need to set up PYTHONPATH.
+# To test start python, import sys and type sys.path. The ae module directory
+# should be included.
+
+from ae_drivers import AE_Pin
+from ae_drivers.dht import AE_DHT, DHT22
 
 dht1 = AE_DHT('dht1', 'Air temperature and humidity', AE_Pin.DHT, sensor=DHT22)
 dht1.setup()

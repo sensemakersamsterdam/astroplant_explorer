@@ -1,8 +1,17 @@
-# ToDo: copyright etc.
+"""
+Control the 16x2 LCD display with Hitachi controller.
+See https: // github.com/sensemakersamsterdam/astroplant_explorer
+"""
 # Reworked version from https://raspberrytips.nl/i2c-lcd-scherm/
+# (c) portions by Sensemakersams.org and others.
+# See https://github.com/sensemakersamsterdam/astroplant_explorer
+# Author: Gijs Mos
+#
+#
+
 import smbus
 from time import sleep
-# from . import _AE_Peripheral_Base
+from . import _AE_Peripheral_Base
 
 I2C_ADDR = 0x38  # default I2C device address
 I2C_BUS = 1  # default I2C bus on Pi
@@ -34,11 +43,12 @@ LCD_INIT = [
 ]
 
 
-class AE_LCD:
+class AE_LCD(_AE_Peripheral_Base):
     """Class to control the 16x2 LCD display with Hitachi controller.
     """
 
-    def __init__(self, i2c_address=I2C_ADDR, i2c_bus=I2C_BUS):
+    def __init__(self, name, description, i2c_address=I2C_ADDR, i2c_bus=I2C_BUS):
+        super().__init__(name, description, 'LCD')
         self._addr = i2c_address
         self._bus_number = i2c_bus
         self.backlight()
@@ -68,7 +78,8 @@ class AE_LCD:
 
         try:
             strobe(mode | (bits & 0xF0) | LCD_BACKLIGHT)  # High bits first
-            strobe(mode | ((bits << 4) & 0xF0) | LCD_BACKLIGHT)  # Low bits second
+            strobe(mode | ((bits << 4) & 0xF0) |
+                   LCD_BACKLIGHT)  # Low bits second
         except Exception as ex:
             print(ex)
 

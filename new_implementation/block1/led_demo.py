@@ -1,10 +1,17 @@
-# ToDO copyright etc.
-from time import sleep
-if True:
-    import sys
-    sys.path.append('..')
-    from ae_drivers.led import AE_LED
-    from ae_drivers import AE_Pin, OFF
+"""
+Demo/test program for the AE_LED driver.
+See https://github.com/sensemakersamsterdam/astroplant_explorer
+"""
+#
+# (c) Sensemakersams.org and others. See https://github.com/sensemakersamsterdam/astroplant_explorer
+# Author: Gijs Mos
+#
+# Warning: if import of ae_* modules fails, then you need to set up PYTHONPATH.
+# To test start python, import sys and type sys.path. The ae module directory
+# should be included.
+
+from ae_drivers.led import AE_LED
+from ae_drivers import AE_Pin, OFF
 
 led1 = AE_LED('led1', 'Super bright red LED', AE_Pin.D20)
 led1.setup(initial_state=OFF)

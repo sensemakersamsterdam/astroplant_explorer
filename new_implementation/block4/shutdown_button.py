@@ -1,12 +1,24 @@
-"""Shutdown the Pi if pressed for 5 seconds or longer.
 """
+Shutdown the Pi if pressed for 5 seconds or longer.
+See https: // github.com/sensemakersamsterdam/astroplant_explorer
+"""
+#
+# (c) Sensemakersams.org and others. See https://github.com/sensemakersamsterdam/astroplant_explorer
+# Author: Gijs Mos
+#
+# Warning: if import of ae_* modules fails, then you need to set up PYTHONPATH.
+# To test start python, import sys and type sys.path. The ae module directory
+# should be included.
+
+#
+# ToDo: move shutdown code to an utilities module.
+#
+
+from ae_drivers.button import AE_Button
+from ae_drivers import AE_Pin
 from time import sleep
+import sys
 import os
-if True:
-    import sys
-    sys.path.append('..')
-    from ae_drivers import AE_Pin
-    from ae_drivers.button import AE_Button
 
 
 btn3 = AE_Button('btn3', 'Stop button', AE_Pin.D7)

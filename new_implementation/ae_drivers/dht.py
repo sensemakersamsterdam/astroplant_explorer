@@ -1,4 +1,12 @@
-# ToDo: copyright etc.
+"""
+ae_drivers DHT11 and DHT22(like) code.
+See https: // github.com/sensemakersamsterdam/astroplant_explorer
+"""
+#
+# (c) Sensemakersams.org and others. See https://github.com/sensemakersamsterdam/astroplant_explorer
+# Author: Gijs Mos
+#
+
 from . import _AE_Peripheral_Base
 import Adafruit_DHT as DHT  # Library copyright Adafruit
 from Adafruit_DHT import DHT22, DHT11, AM2302
