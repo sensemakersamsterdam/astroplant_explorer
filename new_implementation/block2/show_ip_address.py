@@ -3,7 +3,7 @@ if True:
     import sys
     sys.path.append('..')
     from ae_drivers.lcd import AE_LCD
-    from ae_util.ip_utils import IP_Utils
+    from ae_util.ip import IP_Utils
 
 lcd = AE_LCD()
 lcd.setup(erase=False)

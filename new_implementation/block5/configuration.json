@@ -1,0 +1,22 @@
+{
+    "ae_id": "gijs0001",
+    "local_MQTT": {
+        "root_topic": "/asex/{ae_id}/"
+    },
+    "buttons": [{
+            "name": "btn1",
+            "description": "Button 1",
+            "gpio_pin": "D5"
+        },
+        {
+            "name": "btn2",
+            "description": "Button 2",
+            "gpio_pin": "D6"
+        },
+        {
+            "name": "btn3",
+            "description": "Button 3",
+            "gpio_pin": "D7"
+        }
+    ]
+}
