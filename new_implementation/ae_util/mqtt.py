@@ -74,7 +74,7 @@ class AE_Local_MQTT:
     def _rcve_message(self, client, userdata, message, call_back):
         received_time = time()
         topic = message.topic
-        payload = message.payload
+        payload = message.payload.decode()
         # ToDo message also contains qos and retain flags. Should we pass them on too?
         sub_topic = topic.replace(base_topic, '', 1)
         # print('received', message.topic, sub_topic, message.payload, call_back)

@@ -1,22 +1,39 @@
 {
-    "ae_id": "gijs0001",
+    "ae_id": "sense0001",
     "local_MQTT": {
         "root_topic": "asex/{ae_id}/"
     },
     "buttons": [{
             "name": "btn1",
             "description": "Button 1",
-            "gpio_pin": "D5"
+            "AE_Pin": "D5"
         },
         {
             "name": "btn2",
             "description": "Button 2",
-            "gpio_pin": "D6"
+            "AE_Pin": "D6"
         },
         {
             "name": "btn3",
             "description": "Button 3",
-            "gpio_pin": "D7"
+            "AE_Pin": "D7"
         }
-    ]
+    ],
+    "dht_air": {
+        "name": "dht_air",
+        "description": "DHT case air temperature and humidity sensor.",
+        "AE_Pin": "DHT",
+        "pub_interval": 60,
+        "meas_interval": 5,
+        "publish_sub": "sensors/dht",
+        "dht_type": "DHT11"
+    },
+    "fan_control": {
+        "name": "case_fan",
+        "description": "Case cooling fan relay.",
+        "AE_Pin": "D16",
+        "threshold_temperature": 21,
+        "publish_sub": "sensors/case_fan"
+    }
+
 }
