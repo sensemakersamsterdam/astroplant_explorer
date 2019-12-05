@@ -1,5 +1,5 @@
-Astroplant Explorer - new software
-==================================
+Astroplant Explorer - advanced Python
+=====================================
 Prerequisites
 -------------
 
