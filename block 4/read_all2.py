@@ -1,24 +1,28 @@
+#Import all the necessary libraries
 import datetime # for timestamp in logfile
-from time  import sleep, time
+from time import sleep, time
 import DHT_1x
 import waterTemp_1x
 import co2_1x
 import light_1x
 import pathlib # to test if logfile already exists
 import lcdi2c
-import paho.mqtt.client as mqtt
-from credentials import *
+import paho.mqtt.client as mqtt #paho.mqtt is the mqtt protocol
+from credentials import * #credentials is a module made by sensemakers with the credentials to the SURF cloud platform
 import json
- 
-sensor_id = "AstroPlantExplorer.Michiel"
+
+#Define the MQTT settings
+sensor_id = "AstroPlantExplorer.user" #change "user" to your own name
 mqtt_client = mqtt.Client()
 mqtt_server_ip = my_mqtt_host
 mqtt_client.username_pw_set(my_mqtt_user, my_mqtt_password)
 mqtt_client.connect(mqtt_server_ip, port=9998)
-topic = 'pipeline/WON/' + sensor_id
+topic = 'pipeline/WON/' + sensor_id #topic is necessary for the SURF platform / we should move this to credentials
 
-lcdi2c.display('Starting','measurements',5)
+#initiate the lcd
+lcdi2c.display('Starting','measurements',5)#display this text for 5 sec
 
+#create a csv log file
 filename = 'sensor_log.csv'
 path = pathlib.Path(filename)
 if not path.exists():
@@ -27,6 +31,7 @@ if not path.exists():
   csv.write("Timestamp, Temperature, Humidity, WaterTemperature, CO2, Light\n")
   csv.close()
 
+#create the json string for MQTT
 def SMA_send(**params):
         mqtt_client.publish(topic, '{"app_id":"WON", "dev_id": "' + \
         sensor_id + '", "payload_fields": %s}' % json.dumps(params))
@@ -59,7 +64,7 @@ while True:
     print(entry)
   finally:
     csv.close()
-  # send data to SenseMakers Amsterdam backend
+  # send the MQTT string with this data to SenseMakers Amsterdam backend
   try:
       SMA_send(temp=t, hum=h)
   except Exception:
