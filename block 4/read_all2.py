@@ -31,7 +31,7 @@ if not path.exists():
   csv.write("Timestamp, Temperature, Humidity, WaterTemperature, CO2, Light\n")
   csv.close()
 
-#create the json string for MQTT
+#define a function with the json string. 
 def SMA_send(**params):
         mqtt_client.publish(topic, '{"app_id":"WON", "dev_id": "' + \
         sensor_id + '", "payload_fields": %s}' % json.dumps(params))
@@ -64,7 +64,7 @@ while True:
     print(entry)
   finally:
     csv.close()
-  # send the MQTT string with this data to SenseMakers Amsterdam backend
+  # call the MQTT function with the parameters to send this data to SURF cloud platform
   try:
       SMA_send(temp=t, hum=h)
   except Exception:
