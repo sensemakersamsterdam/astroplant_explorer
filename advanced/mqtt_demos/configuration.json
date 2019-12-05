@@ -1,0 +1,12 @@
+{
+    "ae_id": "sense001",
+    "local_MQTT": {
+        "root_topic": "ae_block3/{ae_id}/"
+    },
+    "buttons": [{
+            "name": "btn1",
+            "description": "Button 1",
+            "gpio_pin": "D5"
+        }
+    ]
+}
