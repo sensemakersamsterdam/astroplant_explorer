@@ -2,7 +2,7 @@ import datetime # for timestamp in logfile
 from time  import sleep, time
 import DHT_1x
 import waterTemp_1x
-#import co2_1x
+import co2_1x
 import light_1x
 import pathlib # to test if logfile already exists
 import lcdi2c
@@ -38,18 +38,14 @@ while True:
     h,t = DHT_1x.readSensor()
   except:
     th,  = None
-  #try:
-  #  h = DHT_1x.humidity
-  #except:
-  # h = None
   try:
     wt = waterTemp_1x.read_temp()
   except:
     wt = None
-#  try:
-#    co2 = co2_1x.mh_z19()
-#  except:
-#    co2 = None 
+  try:
+    co2 = co2_1x.mh_z19()
+  except:
+    co2 = None 
   try:
     l = light_1x.readLight()
   except:
@@ -84,14 +80,14 @@ while True:
     lcdi2c.display('water temp',str(round(wt, 2)) + ' C',5)
   else:
     lcdi2c.display('could not read','water temp',5)
- # if co2 is not None:
- #   lcdi2c.display('co2',str(round(co2, 2)) + ' ppm',5)
- # else:
- #   lcdi2c.display('could not read','co2',5)
+  if co2 is not None:
+    lcdi2c.display('co2',str(round(co2, 2)) + ' ppm',5)
+  else:
+    lcdi2c.display('could not read','co2',5)
   if l is not None:
     lcdi2c.display('light',str(round(l, 2)) + ' lux',5)
   else:
     lcdi2c.display('could not read','light',5)
-  #for i in range(35, 0, -1):
-    #lcdi2c.display(' ',str(i),1)
+  for i in range(35, 0, -1):
+    lcdi2c.display(' ',str(i),1)
 
