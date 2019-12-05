@@ -34,6 +34,5 @@ This will print the Python search path. The second one in the list is the one yo
 <br/>and:<br/>
 `sudo rm -f /usr/local/bin/pip; sudo ln -s /usr/local/bin/pip3 /usr/local/bin/pip`
 
-
-
+1. The various AstroPlant Explorer programs will communicate to eachother using the MQTT message broker. Hence we will need Mosquitto MQTT broker. This can be done with `sudo apt --upgrade install mosquitto mosquitto-tools`
 
