@@ -15,8 +15,8 @@ import json
 sensor_id = "AstroPlantExplorer.user" #change "user" to your own name
 mqtt_client = mqtt.Client()
 mqtt_server_ip = my_mqtt_host
-mqtt_client.username_pw_set(my_mqtt_user, my_mqtt_password)
-mqtt_client.connect(mqtt_server_ip, port=9998)
+mqtt_client.username_pw_set(my_mqtt_user, my_mqtt_password) #using credentials module 
+mqtt_client.connect(mqtt_server_ip, port=9998) #using credentials module
 topic = 'pipeline/WON/' + sensor_id #topic is necessary for the SURF platform / we should move this to credentials
 
 #initiate the lcd
