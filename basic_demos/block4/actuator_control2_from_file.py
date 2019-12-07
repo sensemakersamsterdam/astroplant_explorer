@@ -19,39 +19,9 @@ pwm_blue = GPIO.PWM(21, 100)  # Initialize PWM on pwmPin 100Hz frequency
 pwm_farred.start(0)
 pwm_red.start(0)
 pwm_blue.start(0)
-json_str = '''
-{
-    "red": [{
-            "time": "06:00",
-            "value": 80
-        },
-        {
-            "time": "22:00",
-            "value": 20
-        }
-    ],
-    "blue": [{
-            "time": "06:00",
-            "value": 80
-        },
-        {
-            "time": "22:00",
-            "value": 20
-        }
-    ],
-    "farred": [{
-            "time": "06:00",
-            "value": 80
-        },
-        {
-            "time": "22:00",
-            "value": 20
-        }
-    ]
-}
-'''
 
-recipe = json.loads(json_str)
+with open('recipe1.json') as f:
+    recipe = json.load(f)
 # print(recipe)
 
 

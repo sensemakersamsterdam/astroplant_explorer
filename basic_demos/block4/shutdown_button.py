@@ -1,9 +1,9 @@
-#This script turns off the Pi when pushing button 3 (on pin D7) longer than 5 s.
+# This script turns off the Pi when pushing button 3 (on pin D7) longer than 5 s.
 import RPi.GPIO as GPIO
 import os
 import time
 
-gpio_pin_number=7
+gpio_pin_number = 7
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
 

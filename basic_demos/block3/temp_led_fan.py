@@ -1,4 +1,4 @@
-#This scripts uses the watertemperature sensor (waterTemp.py) as input. If T <22 a LED will turn on, if T > 22 a Grove Relay with fan will turn on.
+# This scripts uses the watertemperature sensor (waterTemp.py) as input. If T <22 a LED will turn on, if T > 22 a Grove Relay with fan will turn on.
 import os
 import glob
 import time
@@ -14,11 +14,14 @@ GPIO.setwarnings(False)
 GPIO.setup(20, GPIO.OUT)
 GPIO.setup(16, GPIO.OUT)
 
+
 def read_temp_raw():
     f = open(device_file, 'r')
     lines = f.readlines()
     f.close()
     return lines
+
+
 def read_temp():
     lines = read_temp_raw()
     while lines[0].strip()[-3:] != 'YES':
@@ -30,10 +33,12 @@ def read_temp():
         temp_c = float(temp_string) / 1000.0
         #temp_f = temp_c * 9.0 / 5.0 + 32.0
         return temp_c
+
+
 try:
     while True:
-        #print(read_temp())
-        print ("Temperatuur: " + str(read_temp()) + " C")
+        # print(read_temp())
+        print("Temperatuur: " + str(read_temp()) + " C")
         if read_temp() < 22:
             print("Dit is koud. LED aan en ventilator uit.")
             GPIO.output(20, GPIO.HIGH)
