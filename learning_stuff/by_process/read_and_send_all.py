@@ -85,8 +85,8 @@ while True:
         entry += str(params.get(field, "")) + ","
     entry = entry[:-1] + "\n"   # Replace last comma by newline
 
-    #with open(filename, 'a') as csv:
-    #    csv.write(entry)
+    with open(filename, 'a') as csv:
+        csv.write(entry)
     #    print(entry)
 
     # call the MQTT function with the parameters to send this data to SURF cloud platform
