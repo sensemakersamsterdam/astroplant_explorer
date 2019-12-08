@@ -54,10 +54,11 @@ while True:
 
     # for all sensors try to read them, if not make sure the script
     # does not block and fill None in file
-    params["meas_time"] = datetime.datetime.now()
-
+    params["meas_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
-        params["hum"], params["temp"] = DHT_1x.readSensor()
+        h, t = DHT_1x.readSensor()
+        params["hum"] = h
+        params["temp"] = t
     except Exception:
         pass
 
@@ -81,12 +82,12 @@ while True:
 
     entry = ""
     for field in csv_fields:
-        entry += params.get(field, "") + ","
+        entry += str(params.get(field, "")) + ","
     entry = entry[:-1] + "\n"   # Replace last comma by newline
 
     with open(filename, 'a') as csv:
         csv.write(entry)
-        print(entry)
+    #    print(entry)
 
     # call the MQTT function with the parameters to send this data to SURF cloud platform
     SMA_send(params)
@@ -108,8 +109,8 @@ while True:
         lcdi2c.display('co2', str(round(co2, 2)) + ' ppm', 5)
     else:
         lcdi2c.display('could not read', 'co2', 5)
-    if l is not None:
-        lcdi2c.display('light', str(round(l, 2)) + ' lux', 5)
+    if light is not None:
+        lcdi2c.display('light', str(round(light, 2)) + ' lux', 5)
     else:
         lcdi2c.display('could not read', 'light', 5)
     for i in range(35, 0, -1):
