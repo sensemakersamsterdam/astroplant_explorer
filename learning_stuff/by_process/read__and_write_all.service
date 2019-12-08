@@ -3,7 +3,7 @@ Description=AstroPlant Explorer Read All Sensors
 After=network-online.target
 
 [Service]
-ExecStart=/usr/bin/python3 -u read_all.py
+ExecStart=/usr/bin/python3 -u read_and_write_all.py
 WorkingDirectory=/home/pi/Explorer/
 StandardOutput=inherit
 StandardError=inherit
