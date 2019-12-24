@@ -14,8 +14,7 @@ class IP_Utils:
     @staticmethod
     def get_ip_addresses():
         """Get a list of all IPV4 IP addresses on a default route and their metrics.
-        Sort with the least cost one first.
-        Retuns tupels with cost and IP. Or an empty list if no IP addresses available.
+        Sort with the least cost one first. 
         """
         address_list = []
         try:
@@ -23,8 +22,9 @@ class IP_Utils:
                 for line in f.readlines():
                     fields = line.strip().split(' ')
                     if fields[0] == 'default':
-                        ip = fields[6]
-                        metric = fields[8]
+                        pos = fields.index('metric')
+                        ip = fields[pos-1]
+                        metric = fields[pos+1]
                         address_list.append((metric, ip))
         except Exception as ex:
             print(ex)

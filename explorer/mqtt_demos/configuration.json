@@ -1,7 +1,7 @@
 {
     "ae_id": "sense001",
     "local_MQTT": {
-        "root_topic": "ae_block3/{ae_id}/"
+        "root_topic": "ae_mq_dem/{ae_id}/"
     },
     "buttons": [{
             "name": "btn1",
