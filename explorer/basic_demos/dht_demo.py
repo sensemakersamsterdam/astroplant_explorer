@@ -10,6 +10,7 @@ See https://github.com/sensemakersamsterdam/astroplant_explorer
 # To test start python, import sys and type sys.path. The ae module directory
 # should be included.
 
+from time import sleep
 from ae_drivers import AE_Pin
 from ae_drivers.dht import AE_DHT, DHT22
 
