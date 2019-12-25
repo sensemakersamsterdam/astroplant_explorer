@@ -26,6 +26,8 @@ loc_mqtt = AE_Local_MQTT()
 loc_mqtt.setup()
 
 print('\nType Cntl-C to exit and press button 1...')
+print('button over MQTT demo.')
+print('values published under topic: button1' )
 
 try:
     while True:
