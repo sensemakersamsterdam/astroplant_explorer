@@ -1,29 +1,47 @@
 # Import all the necessary libraries
-import datetime  # for timestamp in logfile
 from time import sleep, time
-import DHT_1x
-import waterTemp_1x
-import co2_1x
-import light_1x
-import pathlib  # to test if logfile already exists
+import datetime  # for timestamp in datalogfile
+import pathlib  # to test if datalogfile already exists
+import DHT22
+import waterTemp
+import co2
+import bh1750
 import lcdi2c
 import paho.mqtt.client as mqtt  # paho.mqtt is the mqtt protocol
 # credentials is a module made by sensemakers with the credentials to the SURF cloud platform
 import credentials
 import json
+import logging #to create error and debug logfile
 
+# Define logger details
+astro_logger = logging.getLogger('AstroplantExplorer')
+astro_logger.setLevel(logging.DEBUG)   # or logging.INFO after the debugging phase
+# create file handler which logs even debug messages
+fh = logging.FileHandler('astroplant_explorer.log')
+fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.ERROR)
+# create formatter and add it to the handlers
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+ch.setFormatter(formatter)
+# add the handlers to the logger
+astro_logger.addHandler(fh) 
+astro_logger.addHandler(ch)
 # Define the MQTT settings
-sensor_id = "AstroPlantExplorer.user"  # change "user" to your own name
 mqtt_client = mqtt.Client()
 mqtt_server_ip = credentials.my_mqtt_host
 # using credentials module
 mqtt_client.username_pw_set(
     credentials.my_mqtt_user, credentials.my_mqtt_password)
-mqtt_client.connect(mqtt_server_ip, port=9998)  # using credentials module
+mqtt_client.connect(mqtt_server_ip, port=9998, keepalive=120)  # using credentials module
+mqtt_client.loop_start()
 # topic is necessary for the SURF platform / we should move this to credentials
-topic = 'pipeline/WON/' + sensor_id
+topic = 'pipeline/WON/AstroPlantExplorer.YourNameHere'
+mqtt_client.enable_logger(logger=astro_logger)
 
-# initiate the lcd
+# initiate measurements
 lcdi2c.display('Starting', 'measurements', 5)  # display this text for 5 sec
 
 # create a csv log file
@@ -37,47 +55,60 @@ if not path.exists():
 
 # define a function with the json string.
 
-
 def SMA_send(params):
-    try:
-        mqtt_client.publish(topic, '{"app_id":"WON", "dev_id": "' +
-                            sensor_id + '", "payload_fields": %s}' % json.dumps(params))
-    except Exception:
-        print('Problem sending to backend via MQTT')
-
+    for _ in range(2):
+        try:
+            msg = '{"app_id":"WON", "dev_id":"AstroPlantExplorer.YourNameHere", "payload_fields": %s}' % json.dumps(params)
+            result = mqtt_client.publish(topic, msg)
+            if result.rc == mqtt.MQTT_ERR_SUCCESS:
+                return
+            elif result.rc == mqtt. MQTT_ERR_NO_CONN:
+                astro_logger.info('reconnecting MQTT')
+                mqtt.reconnect()
+            else:
+                astro_logger.error("Cannot publish, rc=%d, topic=%s, msg=%s", result.rc. topic, msg)
+                return
+        except Exception as ex:
+            astro_logger.exception(ex)     # Log exception info and continue…
+            return
 
 csv_fields = ["meas_time", "temp", "hum", "watertemp", "CO2", "light"]
 
+measurement_interval = 60
 while True:
-
+    t_start = datetime.datetime.now()
     params = {}
 
     # for all sensors try to read them, if not make sure the script
     # does not block and fill None in file
     params["meas_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
-        h, t = DHT_1x.readSensor()
+        h, t = DHT22.readSensor()
         params["hum"] = h
         params["temp"] = t
-    except Exception:
+    except Exception as ex:
+        astro_logger.exception(ex)     # Log exception info and continue…
         pass
 
     try:
-        wt = waterTemp_1x.read_temp()
+        wt = waterTemp.read_temp()
         params["watertemp"] = wt
-    except Exception:
+    except Exception as ex:
+        astro_logger.exception(ex)     # Log exception info and continue…
         pass
 
     try:
-        co2 = co2_1x.mh_z19()
-        params["CO2"] = co2
-    except Exception:
+        CO2 = co2.mh_z19()
+        params["CO2"] = CO2
+    except Exception as ex:
+        astro_logger.exception(ex)     # Log exception info and continue…
         pass
 
     try:
-        light = light_1x.readLight()
+        light = bh1750.readLight()
         params["light"] = light
-    except Exception:
+    except Exception as ex:
+        astro_logger.exception(ex)     # Log exception info and continue…
         pass
 
     entry = ""
@@ -91,6 +122,7 @@ while True:
 
     # call the MQTT function with the parameters to send this data to SURF cloud platform
     SMA_send(params)
+    print(params)
 
     # show measurements on display for 5 seconds each
     if t is not None:
@@ -106,12 +138,16 @@ while True:
     else:
         lcdi2c.display('could not read', 'water temp', 5)
     if co2 is not None:
-        lcdi2c.display('co2', str(round(co2, 2)) + ' ppm', 5)
+        lcdi2c.display('co2', str(round(CO2, 2)) + ' ppm', 5)
     else:
         lcdi2c.display('could not read', 'co2', 5)
     if light is not None:
         lcdi2c.display('light', str(round(light, 2)) + ' lux', 5)
     else:
         lcdi2c.display('could not read', 'light', 5)
-    for i in range(35, 0, -1):
+    timedelta = (datetime.datetime.now()- t_start)
+    time_left = measurement_interval - (timedelta.days * 24 * 3600 + timedelta.seconds)
+    if time_left < 1:
+        time_left = 1
+    for i in range(time_left, 0, -1):
         lcdi2c.display(' ', str(i), 1)
