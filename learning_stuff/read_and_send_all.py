@@ -2,7 +2,8 @@
 from time import sleep, time
 import datetime  # for timestamp in datalogfile
 import pathlib  # to test if datalogfile already exists
-import DHT22
+import DHT22 #if you have a DHT22 sensor otherwise outcomment
+#import bme280 #if you have a BME280 sensor instead of an DHT22
 import waterTemp
 import co2
 import bh1750
@@ -84,6 +85,7 @@ while True:
     params["meas_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
         h, t = DHT22.readSensor()
+        #t, p, h = bme280.readBME280All() #use this for bme280 and outcomment line above
         params["hum"] = h
         params["temp"] = t
     except Exception as ex:
