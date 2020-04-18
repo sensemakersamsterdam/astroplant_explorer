@@ -2,7 +2,8 @@
 from time import sleep, time
 import datetime  # for timestamp in datalogfile
 import pathlib  # to test if datalogfile already exists
-import DHT22
+import DHT22 #if you have a DHT22 sensor otherwise outcomment
+#import bme280 #if you have a BME280 sensor instead of an DHT22
 import waterTemp
 import co2
 import bh1750
@@ -38,7 +39,7 @@ mqtt_client.username_pw_set(
 mqtt_client.connect(mqtt_server_ip, port=9998, keepalive=120)  # using credentials module
 mqtt_client.loop_start()
 # topic is necessary for the SURF platform / we should move this to credentials
-topic = 'pipeline/WON/AstroPlantExplorer.YourNameHere'
+topic = 'pipeline/astroplant/AstroPlantExplorer.YourNameHere'
 mqtt_client.enable_logger(logger=astro_logger)
 
 # initiate measurements
@@ -58,13 +59,13 @@ if not path.exists():
 def SMA_send(params):
     for _ in range(2):
         try:
-            msg = '{"app_id":"WON", "dev_id":"AstroPlantExplorer.YourNameHere", "payload_fields": %s}' % json.dumps(params)
+            msg = '{"app_id":"astroplant", "dev_id":"AstroPlantExplorer.YourNameHere", "payload_fields": %s}' % json.dumps(params)
             result = mqtt_client.publish(topic, msg)
             if result.rc == mqtt.MQTT_ERR_SUCCESS:
                 return
             elif result.rc == mqtt. MQTT_ERR_NO_CONN:
                 astro_logger.info('reconnecting MQTT')
-                mqtt.reconnect()
+                mqtt_client.reconnect()
             else:
                 astro_logger.error("Cannot publish, rc=%d, topic=%s, msg=%s", result.rc. topic, msg)
                 return
@@ -84,6 +85,7 @@ while True:
     params["meas_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
         h, t = DHT22.readSensor()
+        #t, p, h = bme280.readBME280All() #use this for bme280 and outcomment line above
         params["hum"] = h
         params["temp"] = t
     except Exception as ex:

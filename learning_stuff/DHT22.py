@@ -22,18 +22,14 @@
 # SOFTWARE.
 
 # adapted for SensemakersAMS Astroplant Explorer
+# make sure to install the Adafruit_DHT module first with 'sudo pip3 install Adafruit_DHT' 
 import Adafruit_DHT
 
 # Sensor should be set to Adafruit_DHT.DHT11,
 # Adafruit_DHT.DHT22, or Adafruit_DHT.AM2302.
 sensor = Adafruit_DHT.DHT22
 
-# Example using a Beaglebone Black with DHT sensor
-# connected to pin P8_11.
-# pin = 'P8_11'
-
-# Example using a Raspberry Pi with DHT sensor
-# connected to GPIO17.
+# Example using a Raspberry Pi with DHT sensor connected to GPIO17.
 pin = 17
 
 # Try to grab a sensor reading.  Use the read_retry method which will retry up
