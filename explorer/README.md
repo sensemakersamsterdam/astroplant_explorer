@@ -16,6 +16,7 @@ The following software needs to be installed on your Raspberry Pi:
    * pip 19.x.x or higher. Use `pip3 -V` to check.
    * RPi.GPIO library.
    * smbus library.
+   * adafruit-circuitpython-dht library
 
    To install (or upgrade) this lot use <br/>`sudo apt --upgrade install python3 python3-pip python3-rpi.gpio python3-smbus i2c-tools`<br/>and then check versions again.
    To check your i2c use: `sudo i2cscan -y 1`<br/>This should -with the standard AE kit- show your lcd display and possibly more.
