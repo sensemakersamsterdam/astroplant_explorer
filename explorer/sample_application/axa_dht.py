@@ -74,7 +74,7 @@ while not stop_loop:
             sigma_temp += temp
             samples += 1
 
-    if time() > next_publish:
+    if time() >= next_publish:
         # Average results, publish
         data = {sensor_name: {'humidity': round(sigma_hum / samples, 1),
                               'temperature': round(sigma_temp / samples, 1),
@@ -90,6 +90,6 @@ while not stop_loop:
         next_publish += publish_interval
         # print(data)
 
-    sleep(5)
+    sleep(1)
 
 print('Got stop request. DHT Exits')

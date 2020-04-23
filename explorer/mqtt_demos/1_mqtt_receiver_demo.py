@@ -33,6 +33,8 @@ See https://github.com/sensemakersamsterdam/astroplant_explorer
 
 # From the standard time library we now import the function sleep()
 from time import sleep
+import sys
+sys.path.append('../lib')
 
 # From the mqtt library we import the AE_Local_MQTT class which contains a bunch
 # of functions we will use in this script
