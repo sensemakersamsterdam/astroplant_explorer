@@ -6,14 +6,16 @@ See https: // github.com/sensemakersamsterdam/astroplant_explorer
 # (c) Sensemakersams.org and others. See https://github.com/sensemakersamsterdam/astroplant_explorer
 # Author: Gijs Mos
 #
-# Addapted from:
-# http://eleparts.co.kr/data/design/product_file/SENSOR/gas/MH-Z19_CO2%20Manual%20V2.pdf
+# Documentation in Japanese and English:
 # http://qiita.com/UedaTakeyuki/items/c5226960a7328155635f
+# https://www.winsen-sensor.com/d/files/infrared-gas-sensor/mh-z19b-co2-ver1_0.pdf
 
+# Import base class for all sensors and the seial class to read from the device
 from . import _AE_Peripheral_Base
 import serial
 
-COMMAND = b'\xff\x01\x86\x00\x00\x00\x00\x00\x79'
+# START_BYTE + SENSOR# + READ_CO2 + PADDING + CHECHSUM
+_COMMAND = b'\xff\x01\x86\x00\x00\x00\x00\x00\x79'
 
 
 class AE_MHZ19B(_AE_Peripheral_Base):
@@ -26,6 +28,8 @@ class AE_MHZ19B(_AE_Peripheral_Base):
                  bytesize=serial.EIGHTBITS,
                  parity=serial.PARITY_NONE,
                  stopbits=serial.STOPBITS_ONE):
+        """Setup peripheral base and the communication device
+        """
         super().__init__(name, description, 'CO2')
         self._device = device
         self._serial = serial.Serial(device,
@@ -35,21 +39,33 @@ class AE_MHZ19B(_AE_Peripheral_Base):
                                      stopbits=stopbits,
                                      timeout=1.0)
 
-    def value(self):
-        try:
-            self._serial.write(COMMAND)
-            s = self._serial.read(9)
-            if s is None:
-                return None
-        except Exception:
-            return None
 
-        if s[0] == "\xff" and s[1] == "\x86":
-            return (ord(s[2])*256 + ord(s[3]))
+    def value(self):
+        """Read a CO2 value from the sensor
+        """
+        try:
+            self._serial.write(_COMMAND)
+            s = self._serial.read(9)
+            if s[0] == 0xff and s[1] == 0x86:
+                # We did get a CO2 reading
+                return s[2]*256 + s[3]
+        except Exception:
+            # Time-out, bad data, whatever
+            pass
+        return None 
+
 
     def _str_details(self):
-        return 'device = %s, value = %s' % (self._device,
+        """Some more default into the __str__ dunder form the base class
+        """
+        return 'device=%s, value=%s ppm' % (self._device,
                                             self.value())
+
 
     def setup(self):
         pass
+
+
+    def __del__(self):
+        self._serial.close()
+        self._serial = None

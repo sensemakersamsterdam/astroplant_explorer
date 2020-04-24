@@ -15,4 +15,6 @@ class AE_LED(_AE_Output):
     """
 
     def __init__(self, name, description, *arg, **kwarg):
+        """Need just to beef up __init__ a bit.  All the work is done in _AE_Output.
+        """
         super().__init__(name, description, 'LED', *arg, **kwarg)
