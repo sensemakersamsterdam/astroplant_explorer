@@ -39,7 +39,6 @@ class AE_MHZ19B(_AE_Peripheral_Base):
                                      stopbits=stopbits,
                                      timeout=1.0)
 
-
     def value(self):
         """Read a CO2 value from the sensor
         """
@@ -52,8 +51,7 @@ class AE_MHZ19B(_AE_Peripheral_Base):
         except Exception:
             # Time-out, bad data, whatever
             pass
-        return None 
-
+        return None
 
     def _str_details(self):
         """Some more default into the __str__ dunder form the base class
@@ -61,10 +59,8 @@ class AE_MHZ19B(_AE_Peripheral_Base):
         return 'device=%s, value=%s ppm' % (self._device,
                                             self.value())
 
-
     def setup(self):
         pass
-
 
     def __del__(self):
         self._serial.close()

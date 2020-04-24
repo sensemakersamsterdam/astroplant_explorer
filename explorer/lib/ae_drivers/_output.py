@@ -21,12 +21,10 @@ class _AE_Output(_AE_Peripheral):
         self._pin = pin
         self._initial_state = initial_state
 
-
     def _str_details(self):
         return 'pin %s(gpio=%d, conn=%d), value=%s' % (self._pin.name,
                                                        self._pin.value[0], self._pin.value[1],
                                                        self.value())
-
 
     def value(self, set_to=None):
         """Return the current value of the actuator if there is no parameter, else
@@ -41,21 +39,17 @@ class _AE_Output(_AE_Peripheral):
         # Now read back the value
         return GPIO.input(self._pin.value[0])
 
-
     def setup(self, **kwarg):
         GPIO.setup(self._pin.value[0], GPIO.OUT)
         initial_state = kwarg.get('initial_state', self._initial_state)
         if initial_state is not None:
             GPIO.output(self._pin.value[0], initial_state)
 
-
     def on(self):
         return self.value(ON)
 
-
     def off(self):
         return self.value(OFF)
-
 
     def toggle(self):
         return self.value(not self.value())
