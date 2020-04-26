@@ -35,6 +35,8 @@ See https://github.com/sensemakersamsterdam/astroplant_explorer
 # it reads the JSON file configuration.json from your current directory
 # and makes it available to this script as a the dictionary 'cfg'.
 from ae_util.configuration import cfg
+import sys
+sys.path.append('../lib')
 
 # From the standard time library we now import the function sleep()
 from time import sleep

@@ -1,5 +1,5 @@
 """
-ae_drivers actuators common code.
+ae_drivers actuators common code. Provides most of the implementation for simple LEDs, Relays etc.
 See https: // github.com/sensemakersamsterdam/astroplant_explorer
 """
 #
@@ -27,8 +27,11 @@ class _AE_Output(_AE_Peripheral):
                                                        self.value())
 
     def value(self, set_to=None):
+        """Return the current value of the actuator if there is no parameter, else
+           set it first to the value given and then return the current state.
+        """
         if set_to is not None:
-            # Need to change first
+            # Need to change state first
             if set_to:
                 GPIO.output(self._pin.value[0], GPIO.HIGH)
             else:
