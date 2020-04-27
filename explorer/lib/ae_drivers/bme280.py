@@ -17,7 +17,8 @@ See https: // github.com/sensemakersamsterdam/astroplant_explorer
 from . import _AE_Peripheral_Base
 import time
 import smbus
-from ctypes import c_short, c_byte, c_ubyte
+
+DEBUG = 1
 
 I2C_ADDR = 0x76  # default I2C device address
 I2C_BUS = 1  # default I2C bus
@@ -26,10 +27,6 @@ I2C_BUS = 1  # default I2C bus
 
 def _getShort(data, index):
     # return two bytes from data as a signed 16-bit value
-    return c_short((data[index+1] << 8) + data[index])
-
-def _getUShort(data, index):
-    # return two bytes from data as an unsigned 16-bit value
     return (data[index+1] << 8) + data[index]
 
 def _getChar(data, index):
@@ -85,11 +82,11 @@ class AE_BME280(_AE_Peripheral_Base):
         cal3 = bus.read_i2c_block_data(addr, 0xE1, 7)
 
         # Convert byte data to word values
-        dig_T1 = _getUShort(cal1, 0)
+        dig_T1 = _getShort(cal1, 0)
         dig_T2 = _getShort(cal1, 2)
         dig_T3 = _getShort(cal1, 4)
 
-        dig_P1 = _getUShort(cal1, 6)
+        dig_P1 = _getShort(cal1, 6)
         dig_P2 = _getShort(cal1, 8)
         dig_P3 = _getShort(cal1, 10)
         dig_P4 = _getShort(cal1, 12)
@@ -166,7 +163,9 @@ class AE_BME280(_AE_Peripheral_Base):
     def values(self):
         try:
             return self._readBME280All()
-        except Exception:
+        except Exception as ex:
+            if DEBUG:
+                raise ex
             return (None, None, None)
 
     def setup(self, **kwarg):
