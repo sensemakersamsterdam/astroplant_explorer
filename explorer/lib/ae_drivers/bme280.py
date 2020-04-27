@@ -161,7 +161,7 @@ class AE_BME280(_AE_Peripheral_Base):
         return (round(temperature/100.0, 1), round(pressure/100.0, 1), round(humidity, 1))
 
     def _str_details(self):
-        return 'i2c address %s, values=%s' % (str(self._addr), str(self.values()))
+        return 'i2c address %s, values=%s' % (hex(self._addr), str(self.values()))
 
     def values(self):
         try:
