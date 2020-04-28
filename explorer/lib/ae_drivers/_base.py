@@ -7,8 +7,12 @@ See https: // github.com/sensemakersamsterdam/astroplant_explorer
 # Author: Gijs Mos
 #
 
+import sys
 import RPi.GPIO as GPIO
 from enum import Enum
+
+if sys.version_info.major < 3 or sys.version_info.minor < 5:
+    raise NotImplementedError('This software is not implemented for Python versions before 3.5')
 
 # We will use the GPIO module in BCM mode. So we pass GPIO numbers to
 # the library.  Also we do not want warnings printed.

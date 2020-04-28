@@ -12,43 +12,69 @@ See https: // github.com/sensemakersamsterdam/astroplant_explorer
 # Date   : 21/01/2018
 # https://bitbucket.org/MattHawkinsUK/rpispy-misc/raw/master/python/bme280.py
 #
-# Adapted for Astroplant Explorer framework by: Ted van der Togt
+# Adapted for Astroplant Explorer framework by: Ted van der Togt, Gijs Mos
 #
 from . import _AE_Peripheral_Base
 import time
 import smbus
 
-DEBUG = 1
+DEBUG = 0  # Normally on 0. Non zero enable debug code/exceptions
 
 I2C_ADDR = 0x76  # default I2C device address
 I2C_BUS = 1  # default I2C bus
 # Rev 2 Pi, Pi 2, Pi 3, Pi 4 use bus 1
 # Rev 1 Pi uses bus 0
 
+
 def _getShort(data, index):
-    # return two bytes from data as a signed 16-bit value
+    # return two bytes from data at position index as a 16-bit value
+    result = _getUShort(data, index)
+    return result if result < 32767 else result - 65536
+
+
+def _getUShort(data, index):
+    # return two bytes from data as an unsigned 16-bit value
     return (data[index+1] << 8) + data[index]
 
+
 def _getChar(data, index):
-    # return one byte from data as a signed char
+    # return one byte from data as an signed 8-bit value
     result = data[index]
-    if result > 127:
-        result -= 256
-    return result
+    return result if result < 127 else result - 256
+
 
 def _getUChar(data, index):
     # return one byte from data as an unsigned char
-    result = data[index] & 0xFF
-    return result
+    return data[index] & 0xFF
+
 
 class AE_BME280(_AE_Peripheral_Base):
     """This class is to define a BME280 type temperature/pressure/humidity sensor.
     """
+    _instance = None
 
-    def __init__(self, name, description, i2c_address=I2C_ADDR, i2c_bus=I2C_BUS):
-        super().__init__(name, description, 'BME280')
-        self._addr = i2c_address
-        self._bus = smbus.SMBus(i2c_bus)
+    def __new__(cls, *_pars, **_kpars):
+        # We implement as singleton class
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self, name, description, i2c=None, i2c_address=I2C_ADDR, i2c_bus=I2C_BUS):
+        if i2c is not None:
+            bus = i2c
+        else:
+            bus = smbus.SMBus(i2c_bus)
+        if not hasattr(self, 'name'):
+            # First init of the singleton
+            super().__init__(name, description, 'BME280')
+            self._addr = i2c_address
+            self._i2c = bus
+        else:
+            # Subsequent one
+            if name != self.name or \
+                    description != self.description or \
+                    self._addr != i2c_address:
+                print("Subsequent __init__ of singleton AE_BME280 ignored.")
 
     def _readBME280All(self):
         # Register Addresses
@@ -65,7 +91,7 @@ class AE_BME280(_AE_Peripheral_Base):
         OVERSAMPLE_PRES = 2
         MODE = 1
 
-        bus = self._bus
+        bus = self._i2c
         addr = self._addr
 
         # Oversample setting for humidity register - page 26
@@ -82,11 +108,11 @@ class AE_BME280(_AE_Peripheral_Base):
         cal3 = bus.read_i2c_block_data(addr, 0xE1, 7)
 
         # Convert byte data to word values
-        dig_T1 = _getShort(cal1, 0)
+        dig_T1 = _getUShort(cal1, 0)
         dig_T2 = _getShort(cal1, 2)
         dig_T3 = _getShort(cal1, 4)
 
-        dig_P1 = _getShort(cal1, 6)
+        dig_P1 = _getUShort(cal1, 6)
         dig_P2 = _getShort(cal1, 8)
         dig_P3 = _getShort(cal1, 10)
         dig_P4 = _getShort(cal1, 12)
@@ -170,4 +196,8 @@ class AE_BME280(_AE_Peripheral_Base):
 
     def setup(self, **kwarg):
         # One throw away reads to get things going...
-        self.values()
+        # Also test if we actually have a sensor
+        try:
+            self._readBME280All()
+        except Exception as ex:
+            print('Cannot read BME280. Is sensor connected? Message: %s' % ex)

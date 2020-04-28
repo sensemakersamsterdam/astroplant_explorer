@@ -17,8 +17,10 @@ bme280_1 = AE_BME280('bme280_1', 'Air temperature, pressure and humidity')
 bme280_1.setup()
 
 print('BME280 demo. bme280_1 prints as:', bme280_1)
-print('and its description is:', bme280_1.description)
+print('   and its description is:', bme280_1.description)
+print('\r\nReading values 10 times:')
 
 for _ in range(10):
-    print('Temperature=%s C, pressure=%s hPa, humidity=%s %%rel,' % bme280_1.values())
+    print('Temperature=%s C, pressure=%s hPa, humidity=%s %%rel,' %
+          bme280_1.values())
     sleep(1)
