@@ -65,7 +65,7 @@ class AE_LCD(_AE_Peripheral_Base):
         for cmd in LCD_INIT:
             self._lcd_send(cmd, LCD_CMD)
         if erase:
-            self.clear()
+            self.lcd_clear()
 
     def _lcd_send(self, bits, mode):
 
