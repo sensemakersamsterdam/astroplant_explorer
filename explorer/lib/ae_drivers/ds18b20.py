@@ -13,6 +13,9 @@ from . import _AE_Peripheral_Base
 import time
 import os
 import glob
+
+DEBUG = 1  # Normally on 0. Non zero enable debug code/exceptions
+
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
 base_dir = '/sys/bus/w1/devices/'
@@ -53,7 +56,9 @@ class AE_DS18B20(_AE_Peripheral_Base):
         """
         try:
             return self._read_temp()
-        except Exception:
+        except Exception as ex:
+            if DEBUG:
+                raise ex
             return None
 
     def setup(self, **kwarg):
