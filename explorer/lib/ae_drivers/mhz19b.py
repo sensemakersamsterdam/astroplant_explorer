@@ -23,14 +23,14 @@ class AE_MHZ19B(_AE_Peripheral_Base):
     """
 
     def __init__(self, name, description,
-                 device='/dev/ttyS0',
+                 device='/dev/serial0',
                  baudrate=9600,
                  bytesize=serial.EIGHTBITS,
                  parity=serial.PARITY_NONE,
                  stopbits=serial.STOPBITS_ONE):
         """Setup peripheral base and the communication device
         """
-        super().__init__(name, description, 'CO2')
+        super().__init__(name, description, 'CO2 Sensor')
         self._device = device
         self._serial = serial.Serial(device,
                                      baudrate=baudrate,
