@@ -1,0 +1,25 @@
+from PIL import Image
+#im = Image.open('OpenCV.png').convert('RGB')
+im = Image.open('basilicum.jpg').convert('RGB')
+#pix = im.load()
+print("w,h = "+str(im.size))
+w,h=im.size
+totaal_pix=w*h
+
+white = 0
+l_green = 0
+d_green = 0
+other = 0
+
+for pixel in im.getdata():
+    if pixel >= (250,250,250) and pixel <=(255,255,255):
+        white += 1
+    elif pixel >= (50,150,0) and pixel <(250,250,250): #it's a bit of a choice to define what is green and not green
+        l_green += 1 # lightgreen
+    elif pixel >=(0,80,0) and pixel <(50,150,0):
+        d_green += 1 # darkgreen
+    else:
+        other += 1
+print ('white= '+str(white)+' light green= ' + str(l_green)+ ' dark green= '+ str(d_green)+' other ='+str(other))
+perc_green = ((l_green+d_green) / totaal_pix)*100
+print(str(round(perc_green,2))+"% of the image is green")
