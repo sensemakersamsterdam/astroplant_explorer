@@ -1,0 +1,2 @@
+file /home/pi/timelapse/complete.mp4
+file /home/pi/timelapse/out.mp4
