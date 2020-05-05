@@ -13,9 +13,11 @@ See https://github.com/sensemakersamsterdam/astroplant_explorer
 from time import sleep
 from ae_drivers import AE_Pin
 from ae_drivers.dht import AE_DHT, DHT22
+from time import sleep
 
 dht1 = AE_DHT('dht1', 'Air temperature and humidity', AE_Pin.DHT, sensor=DHT22)
 dht1.setup()
+
 
 print('DHT demo. dht1 prints as:', dht1)
 print('and its description is:', dht1.description)
