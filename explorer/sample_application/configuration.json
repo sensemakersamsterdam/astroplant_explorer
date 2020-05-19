@@ -1,7 +1,8 @@
 {
     "ae_id": "sense0001",
     "local_MQTT": {
-        "root_topic": "asex/{ae_id}/"
+        "root_topic": "asex/{ae_id}/",
+        "control_sub_tpc": "control"
     },
     "buttons": [{
             "name": "btn1",
@@ -34,6 +35,10 @@
         "AE_Pin": "D16",
         "threshold_temperature": 21,
         "publish_sub": "sensors/case_fan"
+    },
+    "lcd_display" : {
+        "display_sub_tpc": "lcd_directive",
+        "tick": 0.25
     }
 
 }

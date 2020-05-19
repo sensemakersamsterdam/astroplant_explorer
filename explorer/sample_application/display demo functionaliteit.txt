@@ -1,0 +1,54 @@
+Add or Update sub-sub-topic:
+{
+    "name": "demo",
+    "line1": "Hi guys!",
+    "line2": "Het plok is over.",
+    "showtime": "3",
+    "repeats": 1,
+    "expires": 145555555,
+    "priority": "1",
+    "timestamp": 123121241,
+    "log": true
+}
+
+Adds a new pane somewhere in the queue. If already present it updates an existing one. But not if already displaying.
+
+name - mandatory - unique name of the pane. Can be used to delete it before it expires.
+line1 - mandatroy - text for line 1 (max 16 char)
+line2 - optional - text for line 2 (max 16 char). Default = blank line.
+showtime - mandatory - showtime in seconds for each show.
+repeats - optional - 0 = forever, >0 = # of repeats. Default = 1.
+expires - optional - absolute expiration clock time. 0 = no expiration.  Default now() + 1 minute.
+priority - optional - priority for queueing new panes. 1 (high) to 5 (low). Same prio panes in queueing order. Default = 3.
+timestamp - optional - timestamp used for writing to log. Default = reception time.
+log - optional - write to log file.  Default = false.
+    Log entries will be written upon reception of pane.
+    Will be written exactly once.
+    Log format excel csv: time,priority,line1,line2
+
+Line 1 and 2 special values:
+  *dt* = Date and time as local (summer) time.
+  *ip* = IP address. Highest default routing priority one if multiple IP addresses exist.
+  *host* = Hostname.
+*ae_name* = Astroplane Explorer name (for uniqueness. also part of mqtt messages)
+
+Delete sub-sub-topic:
+{
+    "name": "demo",
+    "abort": true
+}
+
+Deletes pane from queue and perhaps the display.
+
+name - mandatory - unique name of the pane.
+abort - optional - if pane is currently displaying, also remove from display.  Default = false.
+
+Reset sub-sub-topic:
+{
+    "abort": false
+}
+Clears display and all waiting panes.  Including the default ones.
+
+abort - optional - if a pane is currently displaying, remove from display.  Default = false.
+
+

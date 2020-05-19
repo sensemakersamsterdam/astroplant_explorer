@@ -17,13 +17,14 @@ Panes are the size of the display.
 
 from ae_util.ip import IP_Utils
 from ae_drivers.lcd import AE_LCD
-from time import sleep, time
+from time import sleep, time, strftime, asctime
 from ae_util.mqtt import AE_Local_MQTT
 from ae_util.configuration import cfg
 import json
 
 # global variables
-my_cfg = cfg['lcd_display']     # Find out bit in the config file
+my_cfg = cfg['lcd_display']  # Find our bit in the config file
+tick = my_cfg['tick']  # Resolution. Sleep "tick" seconds each loop.
 
 
 def lcd_setup():
@@ -38,7 +39,6 @@ def control_cb(sub_topic, payload, rec_time):
     global stop_loop
     if payload == 'stop':
         stop_loop = True
-        fan.off()
 
 
 def display_cb(sub_topic, payload, rec_time):
@@ -46,19 +46,23 @@ def display_cb(sub_topic, payload, rec_time):
     """
     try:
         directive = json.load(payload)
-
     except Exception as ex:
-        print('Display message:', ex)
+        print('Exception ignored at %s. Probably a bad display directive.\n\rDetails:%s.' %
+              (ex, asctime(rec_time))
+              )
+        return
 
-# Set up the pane structure
+    print('Got directive', sub_topic, directive)
 
 
 def expand(txt):
     """Check string for special instruction and replace if found."""
-    if txt == '*date_time*'
-    return
-    elif txt == '*IP*'
-    return
+    if txt == '*date_time*':
+        return strftime('%d-%m-%Y %H:%M')  # 01-01-2020 18:12
+    elif txt == '*time':
+        return strftime('%H:%M:%S')  # 01-01-2020 18:12
+    elif txt == '*IP*':
+        return IP_Utils.get_main_ip_address() or 'no network'
     else:
         return txt
 
@@ -75,8 +79,8 @@ class pane:
     def display(self):
         global lcd
         print('Displaying: ', expand(self._line0), expand(self._line1))
-        # lcd.lcd_string(self._line0, 0)
-        # lcd.lcd_string(self._line1, 1)
+        lcd.lcd_string(self._line0, 0)
+        lcd.lcd_string(self._line1, 1)
         self._started = time()
 
     def is_recurring(self):
@@ -98,12 +102,12 @@ class Panes:
         self._panes = {}
 
     def add_or_replace(self, pane, priority=False):
-        replacement = pane.name in self._panes
+        # TODO add raeplace/update functioality
+        # replacement = pane.name in self._panes
+        self._panes.append(pane)
 
-        self._panes[pane.name] = pane
-
-    def advance(self):
-        """Called during poll to find out if something should happen with the LCD."""
+    def lcd_tick(self):
+        """Called during main loop to find out if something should happen with the LCD."""
 
         def get_next():
             try:
@@ -111,13 +115,20 @@ class Panes:
             except IndexError:
                 # Nothing to do as it seems
                 self._displaying = None
-                dsp.lcd_clear()
+                lcd.lcd_clear()
                 return
             next.display()  # Put it on
 
-        if self._displaying is None:
+        active_pane = self._displaying
+        if active_pane is None:
             get_next()
         else:
+            if active_pane._started - time() > active_pane._disp_time:
+                # W're done
+                if active_pane._recurring:
+                    # Put it back at the end
+                    self._queue.append(active_pane)
+                get_next()
 
 
 panes = Panes()
@@ -128,27 +139,27 @@ panes.add_or_replace(pane('start',
 panes.add_or_replace(pane('DT&IP',
                           '*date_time*',
                           '*IP*',
-                          display_time=1.5, recurring=True))
-
+                          display_time=2, recurring=True))
+panes.add_or_replace(pane('Sensemakers',
+                          '  Sensemakers',
+                          'AstroPlant Xplrr',
+                          display_time=2, recurring=True))
 
 # Setup the LCD
 lcd = lcd_setup()
-
 
 # Setup our local MQTT agent. Parameters are obtained from the ./configuration.json file.
 loc_mqtt = AE_Local_MQTT()
 loc_mqtt.setup()
 
 # Open input channel for application control messages
-loc_mqtt.subscribe('control', control_cb)
+loc_mqtt.subscribe(cfg['local_MQTT']['control_sub_tpc'], control_cb)
 
 # Open input channel for display messages
-loc_mqtt.subscribe(dht_sub_topic, display_cb)
-
+loc_mqtt.subscribe(my_cfg['display_sub_tpc'], display_cb)
 
 while not stop_loop:
+    panes.lcd_tick()
+    sleep(tick)
 
-    sleep(0.2)
-
-fan.off()
 print('Got stop request. Display exits')
