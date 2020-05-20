@@ -32,7 +32,7 @@ This will print the Python search path. The second one in the list is the one yo
 1. Python 3.x will now be accessible with `python3` and pip 19.x with `pip3`.  If you make Python 3.x your standard, and you should since versions 2.x are now officially obsoleted, it is conveinient to have `python` and `pip` to execute the Python 3 and Pip 19 versions respectively.  To do this ececute:<br/>
 `sudo rm -f /usr/bin/python; sudo ln -s /usr/bin/python3 /usr/bin/python`
 <br/>and:<br/>
-`sudo rm -f /usr/local/bin/pip; sudo ln -s /usr/local/bin/pip3 /usr/local/bin/pip`
+`sudo rm -f /usr/bin/pip; sudo ln -s /usr/local/bin/pip3 /usr/bin/pip`
 
 1. The various AstroPlant Explorer programs will communicate to eachother using the MQTT message broker. Hence we will need Mosquitto MQTT broker. This can be done with `sudo apt --upgrade install mosquitto mosquitto-tools`
 
