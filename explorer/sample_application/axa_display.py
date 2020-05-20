@@ -2,22 +2,20 @@
 Sample implementation: LCD display.
 See https://github.com/sensemakersamsterdam/astroplant_explorer
 
-For the display we do 3 panes. Panes will rotate with a configurable time.
-There is one priority pane that will display the specified time and then diasppear.
 Panes are the size of the display.
 """
 #
 # (c) Sensemakersams.org and others. See https://github.com/sensemakersamsterdam/astroplant_explorer
 # Author: Gijs Mos
 #
-# Warning: if import of ae_* modules fails, then you need to set up PYTHONPATH.
+# WARNING: if import of ae_* modules fails, then you need to set up PYTHONPATH.
 # To test start python, import sys and type sys.path. The ae module directory
 # should be included.
 
 
 from ae_util.ip import IP_Utils
 from ae_drivers.lcd import AE_LCD
-from time import sleep, time, strftime, asctime
+from time import sleep, time, strftime, asctime, localtime
 from ae_util.mqtt import AE_Local_MQTT
 from ae_util.configuration import cfg
 import json
@@ -25,6 +23,7 @@ import json
 # global variables
 my_cfg = cfg['lcd_display']  # Find our bit in the config file
 tick = my_cfg['tick']  # Resolution. Sleep "tick" seconds each loop.
+stop_loop = False
 
 
 def lcd_setup():
@@ -42,20 +41,31 @@ def control_cb(sub_topic, payload, rec_time):
 
 
 def display_cb(sub_topic, payload, rec_time):
-    """Handle Display messages.
+    """Handle display messages.
     """
     try:
-        directive = json.load(payload)
+        directive = json.loads(payload)
+        print('Got directive', sub_topic, directive)
+        panes.execute(directive)
     except Exception as ex:
-        print('Exception ignored at %s. Probably a bad display directive.\n\rDetails:%s.' %
-              (ex, asctime(rec_time))
-              )
+        print('Bad directive received at %s.\n\rDetails: %s' %
+              (asctime(localtime(rec_time)), ex))
         return
 
-    print('Got directive', sub_topic, directive)
+
+def debug_cb(sub_topic, payload, rec_time):
+    print('\n\rDebug (%s) at %s:' % (payload, asctime()))
+    print('==Panes==')
+    for pane in panes._panes.values():
+        print(pane)
+    print('==Queue==')
+    for pane in panes._queue:
+        print(pane)
+    print("==active==")
+    print(panes._active_pane)
 
 
-def expand(txt):
+def enrich(txt):
     """Check string for special instruction and replace if found."""
     if txt == '*date_time*':
         return strftime('%d-%m-%Y %H:%M')  # 01-01-2020 18:12
@@ -68,85 +78,153 @@ def expand(txt):
 
 
 class pane:
-    def __init__(self, name, line1, line2, display_time=2, recurring=True):
-        self._name = name
-        self._disp_time = display_time
-        self._recurring = recurring
-        self._line0 = line1
-        self._line1 = line2
-        self._started = None
+    def __init__(self, pane_id, l1=None, l2=None, secs=2, recur=True):
+        self.pane_id = pane_id
+        self._disp_time = secs
+        self._recurring = recur
+        self._line0 = l1
+        self._line1 = l2
+        self.started_at = None
 
-    def display(self):
+    def re_display(self):
+        """Re-display our content on the LCD."""
         global lcd
-        print('Displaying: ', expand(self._line0), expand(self._line1))
-        lcd.lcd_string(self._line0, 0)
-        lcd.lcd_string(self._line1, 1)
-        self._started = time()
+        if self._line0:
+            # Update line 1 since there is new content.
+            lcd.lcd_string(enrich(self._line0), 0)
+        if self._line1:
+            # Update line 2 since there is new content.
+            lcd.lcd_string(enrich(self._line1), 1)
+
+    def start_display(self):
+        """Display our content on the LCD."""
+        self.re_display()
+        self.started_at = time()  # To compute display time later
 
     def is_recurring(self):
         """Returns True if pane is repeating"""
         return self._recurring
 
-    def still_on(self):
-        """Returns True if pane should still be on"""
-        return time() < self._started + self._disp_time if self._started else None
+    def is_done(self):
+        """Returns True if pane has been displayed long enough."""
+        return time() >= self.started_at + self._disp_time if self.started_at else True
 
-    def reset_time(self):
-        self._disp_time = None
+    def __str__(self):
+        return('pane at 0x%x(id="%s", l1="%s", l2="%s", secs=%s, recur=%s)' %
+               (id(self), self.pane_id, self._line0, self._line1, self._disp_time, self._recurring))
 
 
 class Panes:
-    def __init__(self):
-        self._queue = []
-        self._displaying = None
-        self._panes = {}
+    """A class to hold all our LCD panes and control displaying them."""
 
-    def add_or_replace(self, pane, priority=False):
-        # TODO add raeplace/update functioality
-        # replacement = pane.name in self._panes
-        self._panes.append(pane)
+    def __init__(self):
+        """Set-up the panes. Everything starts empty."""
+        self._queue = []  # The display queue
+        self._active_pane = None  # The pane currently on display
+        self._panes = {}  # Definition of all panes
+
+    def insert_update(self, pane):
+        """Insert a pane, or update it if we already have it.
+        Panes are identified by pane.pane_id.
+        """
+        pane_id = pane.pane_id
+        existing_pane = self._panes.get(pane_id)
+
+        # Insert the new definition
+        self._panes[pane_id] = pane
+
+        if existing_pane is None:
+            # New pane, just queue it.
+            self._queue.append(pane)
+        else:
+            # We need to maintain started_at time.
+            pane.started_at = existing_pane.started_at
+
+    def delete(self, id_):
+        p = self._panes.pop(id_)
+        try:
+            self._queue.remove(p)
+        except ValueError:
+            # We don't have this pane.
+            pass
 
     def lcd_tick(self):
         """Called during main loop to find out if something should happen with the LCD."""
 
-        def get_next():
+        def display_next():
+            """Helper to display some text."""
             try:
-                self._displaying = next = self._queue.pop(0)
+                self._active_pane = next_pane = self._panes[self._queue.pop(0).pane_id]
             except IndexError:
                 # Nothing to do as it seems
-                self._displaying = None
+                self._active_pane = None
                 lcd.lcd_clear()
                 return
-            next.display()  # Put it on
+            next_pane.start_display()  # Put next one on
 
-        active_pane = self._displaying
+        active_pane = self._active_pane
         if active_pane is None:
-            get_next()
+            # We are not displaying, but may have active panes. Give it a try.
+            display_next()
         else:
-            if active_pane._started - time() > active_pane._disp_time:
-                # W're done
-                if active_pane._recurring:
-                    # Put it back at the end
-                    self._queue.append(active_pane)
-                get_next()
+            # We are currently displaying. Get the actual definition.
+            pane = self._panes.get(active_pane.pane_id)
+            if pane is None:
+                # Our definition no longer exist. Stop display and get the next.
+                display_next()
+            elif pane is not active_pane:
+                # Different pane with same ID. The started_at is maintained, so just
+                # update self._active_pane and re_display
+                self._active_pane = pane
+                pane.re_display()
+                # Deliberately ignore display time check for one tick, so we can see the change.
+            elif active_pane.is_done():
+                # No change, but We're done displaying
+                if active_pane.is_recurring():
+                    # Put it back at the end, and keep the definition
+                    self._queue.append(pane)
+                else:
+                    # Throw away the definition
+                    self._panes.pop(active_pane.pane_id)
+                display_next()  # and get the next one, if any
+
+    def execute(self, directive):
+        """Get directive for a pane definition and handle it accordingly to the action given."""
+        action = directive['action']
+        assert action in {
+            'upsert', 'delete'}, "Need an action like upsert or delete."
+        pane_id = directive.get('id')
+        assert pane_id and len(pane_id) > 0, 'Need an ID.'
+
+        if action == 'upsert':
+            l1 = directive.get('l1', None)
+            l2 = directive.get('l2', None)
+            assert l1 or l2, 'Need at least one of l1, l2'
+            secs = directive.get('secs') or 2
+            recur = directive.get('recur') or False
+            self.insert_update(
+                pane(pane_id, l1, l2, secs=secs, recur=recur)
+            )
+        elif action == 'delete':
+            self.delete(pane_id)
+
+    def preload(self, preload_directives):
+        """Preload panes from the configuration file (if any)."""
+        for directive in preload_directives:
+            self.execute(directive)
 
 
-panes = Panes()
-panes.add_or_replace(pane('start',
-                          'AstroPlant Xplrr',
-                          'Starting up...',
-                          display_time=5, recurring=False))
-panes.add_or_replace(pane('DT&IP',
-                          '*date_time*',
-                          '*IP*',
-                          display_time=2, recurring=True))
-panes.add_or_replace(pane('Sensemakers',
-                          '  Sensemakers',
-                          'AstroPlant Xplrr',
-                          display_time=2, recurring=True))
+# TODO priority based queuing
+# TODO display background intensity
+print('LCD display (axa_display.py) version 0.1 (no priority, no background intensity)')
 
-# Setup the LCD
+# Get our LCD display going empty
 lcd = lcd_setup()
+
+# Set-up our panes structure and preload panes.
+panes = Panes()
+if 'preloads' in my_cfg:
+    panes.preload(my_cfg['preloads'])
 
 # Setup our local MQTT agent. Parameters are obtained from the ./configuration.json file.
 loc_mqtt = AE_Local_MQTT()
@@ -158,8 +236,12 @@ loc_mqtt.subscribe(cfg['local_MQTT']['control_sub_tpc'], control_cb)
 # Open input channel for display messages
 loc_mqtt.subscribe(my_cfg['display_sub_tpc'], display_cb)
 
+loc_mqtt.subscribe('debug', debug_cb)
+
 while not stop_loop:
+    # Check status and change display if needed.
     panes.lcd_tick()
     sleep(tick)
 
-print('Got stop request. Display exits')
+print('Got stop request. LCD display exits')
+lcd.lcd_clear()
