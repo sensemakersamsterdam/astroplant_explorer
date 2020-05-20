@@ -155,7 +155,7 @@ class Panes:
             """Helper to display some text."""
             try:
                 self._active_pane = next_pane = self._panes[self._queue.pop(0).pane_id]
-            except IndexError:
+            except (IndexError, KeyError):
                 # Nothing to do as it seems
                 self._active_pane = None
                 lcd.lcd_clear()

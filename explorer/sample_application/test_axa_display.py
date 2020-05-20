@@ -31,7 +31,7 @@ sleep(5)
 test_cases = [
     (-1, '1- one time message, 10 secs, no priority.',
         (
-            '{"action":"upsert", "id":"p1", "l1":"line - 1", "l2":"test 1", "secs":10}',
+            '{"action":"upsert", "id":"p1", "l1":"line - 1", "l2":"test 1", "secs":5}',
         )
      ),
     (-1, '2- recurring message, 1 secs.',
@@ -41,7 +41,7 @@ test_cases = [
      ),
     (-1, '3- update recurring message, 2 secs.',
         (
-            '{"action":"upsert", "id":"p2", "l1":"line - 1 - updates", "l2":"test 3", "secs":2, "recur":true}',
+            '{"action":"upsert", "id":"p2", "l1":"line - 1 - upd!", "l2":"test 3", "secs":2, "recur":true}',
         )
      ),
     (-1, 'End of the tests...',
