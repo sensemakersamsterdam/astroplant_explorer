@@ -20,5 +20,5 @@ print('DS18B20 demo. ds18b20_1 prints as:', ds18b20_1)
 print('and its description is:', ds18b20_1.description)
 
 for _ in range(10):
-    print('Water temperature=%s Celsius' % ds18b20_1.value())
+    print('Water temperature= %s Celsius' % ds18b20_1.value())
     sleep(1)

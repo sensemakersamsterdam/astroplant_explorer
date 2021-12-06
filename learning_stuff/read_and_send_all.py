@@ -6,6 +6,7 @@ import DHT22 #if you have a DHT22 sensor otherwise outcomment
 #import bme280 #if you have a BME280 sensor instead of an DHT22
 import waterTemp
 import co2
+import sunrise
 import bh1750
 import lcdi2c
 import paho.mqtt.client as mqtt  # paho.mqtt is the mqtt protocol
@@ -105,7 +106,12 @@ while True:
     except Exception as ex:
         astro_logger.exception(ex)     # Log exception info and continue…
         pass
-
+    try:
+        CO2_sun = sunrise.readSunrise()
+        params["CO2_sun"] = CO2_sun
+    except Exception as ex:
+        astro_logger.exception(ex)     # Log exception info and continue…
+        pass
     try:
         light = bh1750.readLight()
         params["light"] = light
@@ -139,10 +145,14 @@ while True:
         lcdi2c.display('water temp', str(round(wt, 2)) + ' C', 5)
     else:
         lcdi2c.display('could not read', 'water temp', 5)
-    if co2 is not None:
+    if CO2 is not None:
         lcdi2c.display('co2', str(round(CO2, 2)) + ' ppm', 5)
     else:
         lcdi2c.display('could not read', 'co2', 5)
+    if CO2_sun is not None:
+        lcdi2c.display('co2_sunrise', str(round(CO2_sun, 2)) + ' ppm', 5)
+    else:
+        lcdi2c.display('could not read', 'co2_sun', 5)
     if light is not None:
         lcdi2c.display('light', str(round(light, 2)) + ' lux', 5)
     else:

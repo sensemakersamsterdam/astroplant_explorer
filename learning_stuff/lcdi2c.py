@@ -4,7 +4,7 @@ import smbus
 import time
 import datetime
 
-I2C_ADDR  = 0x38 # I2C device address
+I2C_ADDR  = 0x27 # I2C device address
 LCD_WIDTH = 16   # Maximum characters per line
 
 # Define some device constants

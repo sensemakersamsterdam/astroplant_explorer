@@ -3,4 +3,5 @@ credentials.py
 .vscode/
 __pycache__/
 *.pyc
+/.idea
 
